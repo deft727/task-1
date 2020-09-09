@@ -1,0 +1,71 @@
+
+
+        {% extends "base.html" %}
+
+        {% block content %}
+        
+        
+    <div class="container">
+
+        <h1 class="text-center mt-1"> Блог </h1>
+            </div>
+
+    <div class="row" style= margin-top:50px;margin-left:315px>
+        <div class="col-md-2 offset-md-6">
+            <span><b>СОРТИРОВКА</b></span>
+            
+            <a href="/?sort=1">&uarr;</a>
+            <a href="/?sort=2">&darr;</a>
+        </div>
+</div>
+
+
+<div class="container mt-5">
+
+
+    {%for art in pages.items%}
+    <div class="alert alert-secondary">
+        <h2>{{art.Header}}</h2>
+        <p>{{ art.Authors}}</p>
+        <p><b>Дата : {{art.creationData}}</b></p>
+        <a href="/show?id={{ art.id }}"class="btn btn-warning"> Детальнее </a>
+    </div>
+
+    {%endfor%}
+
+            </ul>
+            <nav aria-label="...">
+                <ul class="pagination">
+                  <li {%if not pages.prev_num%} class="page-item disabled" {%else%} class="page-item " {%endif%}>
+                    <a class="page-link" href='./?page={{pages.prev_num}}' tabindex="-1">«</a>
+                  </li>
+                  
+                  {%for page in pages.iter_pages() %} 
+                  {%if  page==pages.page%} <li class="page-item active">{%endif%}
+                      {%if page %}
+                      
+                    <a class="page-link" href="./?page={{page}}">{{page}} <span class="sr-only">(current)</span></a>
+                  </li>
+                  {%else%}
+                  <li class="page-item disabled"><a class="page-link" href="">...</a></li>
+                  {%endif%}
+                  {% endfor %}
+              
+                  <li {%if not pages.next_num%} class="page-item disabled" {%else%} class="page-item " {%endif%}>
+                      <a class="page-link" href="./?page={{pages.next_num}}">»</a>
+                  </li>
+              </ul>
+              </nav>        </div>
+
+{% endblock %}
+
+</body>
+
+</html>
+
+
+
+
+
+
+

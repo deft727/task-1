@@ -1,0 +1,76 @@
+
+    {% extends "base.html" %}
+
+    {% block content %}
+
+ 
+    <div class="container">
+
+        <h1 class="text-center mt-5">Register</h1>
+        
+        
+
+        <form class="form col-md-8 offset-md-2 mb-5" action="" method="POST">
+            {{ regform.hidden_tag() }}
+            <div class="form-group">
+                {{ regform.username.label() }}
+                {{ regform.username(class="form-control") }}   
+                {% if regform.username.errors %}
+                    {% for error in regform.username.errors %}
+                    <div style="background-color: rosybrown; border-radius: 5px; border: 1px solid black;">
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+                {% endif %} 
+            </div>
+            <div class="form-group"> 
+                {{ regform.email.label() }}
+                {{ regform.email(class="form-control") }}
+                {% if regform.email.errors %}
+                {% for error in regform.email.errors %}
+                <div style="background-color: rosybrown; border-radius: 5px; border: 1px solid black;">
+                    {{ error }}
+                </div>
+                {% endfor %}
+            {% endif %} 
+            </div>
+            <div class="form-group">
+                
+                {{ regform.password1.label() }}
+                {{ regform.password1(class="form-control") }}
+                {% if regform.password1.errors %}
+                {% for error in regform.password1.errors %}
+                <div style="background-color: rosybrown; border-radius: 5px; border: 1px solid black;">
+                    {{ error }}
+                </div>
+                {% endfor %}
+            {% endif %} 
+            </div>
+            <div class="form-group">
+                {{ regform.password2.label() }}
+                {{ regform.password2(class="form-control") }}
+                {% if regform.password2.errors %}
+                {% for error in regform.password2.errors %}
+                <div style="background-color: rosybrown; border-radius: 5px; border: 1px solid black;">
+                    {{ error }}
+                </div>
+                {% endfor %}
+            {% endif %} 
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Register</button>
+           
+            <!-- <div class="form-group">
+                <label for="exampleFormControlTextarea1">Example textarea</label>
+                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+              </div> -->
+        </form>
+
+
+    
+        </div>
+    </div>
+
+{% endblock %}
+
+

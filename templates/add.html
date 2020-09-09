@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="container">
+
+        <h1 class="text-center mt-5"> Добавить статью </h1>
+        
+
+        <form class="form col-md-8 offset-md-2 mb-5" method="POST"  enctype="multipart/form-data">    
+
+          {{ form.hidden_tag() }}
+          <div>
+              {{ form.Header.label() }} 
+              {{ form.Header(class="form-control flex-grow-1 mr-2") }} 
+              
+            
+              <div class="form-group">
+                {{ form.Content.label() }} 
+                {{form.Content(class="form-control") }} 
+                {% if form.Content.errors %}
+                    {% for error in form.Content.errors %}
+                    <div style="background-color: rosybrown; border-radius: 5px; border: 1px solid black;">
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+                    {% endif %} 
+
+            </div>
+
+
+            <div class="form-group">
+                {{form.img1}} 
+            </div>
+
+            <div class="form-group">
+                {{ form.img_name1.label() }} 
+                {{form.img_name1(class="form-control") }} 
+                {% if form.img_name1.errors %}
+                    {% for error in form.img_name1.errors %}
+                    <div style="background-color: rosybrown; border-radius: 5px; border: 1px solid black;">
+                        {{ error }}
+                        </div>
+                        {% endfor %}
+                        {% endif %}     
+                          </div>
+            
+         <br>
+          
+        {{  form.Btm(class="btn btn-primary") }}</button>
+      </form>
+
+</div>
+    
+
+{% endblock %}
