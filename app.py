@@ -28,7 +28,6 @@ db = SQLAlchemy(app)
 admin = Admin(app)
 
 
-
 class Article(db.Model):
     __tablename__ = 'articl'
     id=db.Column(db.Integer,primary_key=True)
@@ -201,4 +200,5 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
+    # app.run(debug=True)
