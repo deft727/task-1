@@ -119,14 +119,18 @@ class RegisterForm(FlaskForm) :
 def index():
     order = request.args.get('sort')
     page=request.args.get('page')
+    tag=request.args.get('tag')
+    articles = Article.query.order_by(Article.creationData.desc())
 
+    if tag:
+        tags= Tag.query.filter_by(name=tag).first()
+        articles=Article.query.filter_by(id=tags.postId)
+        
     if order is not None:
         if order == '1':
             articles = Article.query.order_by(Article.creationData)
         elif order == '2':
             articles = Article.query.order_by(Article.creationData.desc())
-    else:
-        articles = Article.query.order_by(Article.creationData.desc())
 
     if page and page.isdigit():
         page=int(page)
