@@ -41,12 +41,20 @@ class Article(db.Model):
     content = db.Column(db.String(1500), nullable = False)
     img1=db.Column(db.String(248), nullable=True)
     creationData=db.Column(db.DateTime,default=datetime.now())
+    tags= db.relationship('Tag',backref='Tag',lazy='dynamic')
     def __repr__(self) :
         return f'<Blog{self.content}>'
 
-# class Tag(db.Model):
-#     id=db.Column(db.Integer,primary_key=True)
-
+class Tag(db.Model):
+    id=db.Column(db.Integer,primary_key=True)
+    name=db.Column(db.String(100))
+    slug=db.Column(db.String(100))
+    postId=db.Column(db.Integer, db.ForeignKey('articl.id'))
+    def __repr__(self) :
+        return f'<Tag{self.slug}>'
+    # def __init__ (self,*args,**kwargs):
+    #     super(Tag,self).__init__(*args,**kwargs)
+    #     self.slug=slugify(self.name)
 
 class Users(db.Model, UserMixin):
     __tablename__ = 'Users'
@@ -111,6 +119,7 @@ class RegisterForm(FlaskForm) :
 def index():
     order = request.args.get('sort')
     page=request.args.get('page')
+
     if order is not None:
         if order == '1':
             articles = Article.query.order_by(Article.creationData)
@@ -129,9 +138,11 @@ def index():
 
 @app.route('/show', methods=['GET'])
 def show():
+
     artId = request.args.get('id')
+    tags=Tag.query.filter_by(postId=artId).all()
     text = Article.query.filter_by(id=artId).first()
-    return render_template('show.html',art=text)
+    return render_template('show.html',art=text,tags=tags)
 
 @app.route('/register', methods=[ 'GET', 'POST' ])
 def register() :
