@@ -35,9 +35,13 @@ class Article(db.Model):
     Header=db.Column(db.String(300), nullable = False)
     content = db.Column(db.String(1500), nullable = False)
     img1=db.Column(db.String(248), nullable=True)
-    creationData=db.Column(db.DateTime)
+    creationData=db.Column(db.DateTime,default=datetime.now())
     def __repr__(self) :
         return f'<Blog{self.content}>'
+
+# class Tag(db.Model):
+#     pass
+
 
 class Users(db.Model, UserMixin):
     __tablename__ = 'Users'
@@ -45,7 +49,7 @@ class Users(db.Model, UserMixin):
     username=db.Column(db.String(50), nullable = False)
     email=db.Column(db.String(50), nullable = False)
     password = db.Column(db.String(250), nullable = False)
-    creationData=db.Column(db.DateTime)
+    creationData=db.Column(db.DateTime,default=datetime.now())
     def __repr__(self) :
         return f'<Users{self.content}>'
 
@@ -127,7 +131,7 @@ def show():
 @app.route('/register', methods=[ 'GET', 'POST' ])
 def register() :
     reg = RegisterForm()
-    time=datetime.now()
+    # time=datetime.now()
     if current_user.is_authenticated:
         redirect(url_for('index'))
     if reg.validate_on_submit():
@@ -137,7 +141,7 @@ def register() :
         # print(password1)
         #password = bcrypt.hashpw(b"reg.password1.data", bcrypt.gensalt(14))
         password=generate_password_hash(password1)
-        usersData=Users(username=user,email=email,password=password,creationData=time)
+        usersData=Users(username=user,email=email,password=password)#creationData=time
         db.session.add(usersData)
         db.session.commit()
         return redirect('/login')
@@ -170,7 +174,7 @@ def login():
 @app.route('/add', methods=['GET', 'POST'])
 @login_required
 def add():
-    time = datetime.now()
+    # time = datetime.now()
     form = ArticleForm()
     Header=request.form.get('Header')
     Authors=current_user.username
@@ -186,7 +190,7 @@ def add():
         image.save(os.path.join(app.config['UPLOAD_FOLDER'], name))
 
     if form.validate_on_submit():
-        article = Article(Authors=Authors, Header=Header, content=Content, img1=name,creationData=time)
+        article = Article(Authors=Authors, Header=Header, content=Content, img1=name)#creationData=time)
         db.session.add(article)
         db.session.commit()
         return redirect('/')
@@ -200,5 +204,5 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run()
-    # app.run(debug=True)
+    #app.run()
+    app.run(debug=True)
