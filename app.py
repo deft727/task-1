@@ -16,6 +16,9 @@ from os.path import join, dirname, realpath
 from config import MConfig
 from PIL import Image
 import PIL
+from flask_migrate import Migrate,MigrateCommand
+from flask_script import Manager
+
 
 app = Flask(__name__)
 
@@ -26,7 +29,9 @@ login_manager.login_message_category = 'info'
 app.config.from_object(MConfig)
 db = SQLAlchemy(app)
 admin = Admin(app)
-
+migrate=Migrate(app, db)
+manager=Manager(app)
+manager.add_command('db',MigrateCommand)
 
 class Article(db.Model):
     __tablename__ = 'articl'
@@ -40,7 +45,7 @@ class Article(db.Model):
         return f'<Blog{self.content}>'
 
 # class Tag(db.Model):
-#     pass
+#     id=db.Column(db.Integer,primary_key=True)
 
 
 class Users(db.Model, UserMixin):
