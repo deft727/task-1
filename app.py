@@ -18,7 +18,7 @@ from PIL import Image
 import PIL
 from flask_migrate import Migrate,MigrateCommand
 from flask_script import Manager
-
+import random
 
 app = Flask(__name__)
 
@@ -34,27 +34,25 @@ manager=Manager(app)
 manager.add_command('db',MigrateCommand)
 
 class Article(db.Model):
-    __tablename__ = 'articl'
     id=db.Column(db.Integer,primary_key=True)
     Authors=db.Column(db.String(50), nullable = False)
     Header=db.Column(db.String(300), nullable = False)
     content = db.Column(db.String(1500), nullable = False)
     img1=db.Column(db.String(248), nullable=True)
     creationData=db.Column(db.DateTime,default=datetime.now())
-    tags= db.relationship('Tag',backref='Tag',lazy='dynamic')
+    tagi= db.relationship('Tag',backref='tags',lazy='dynamic')
     def __repr__(self) :
         return f'<Blog{self.content}>'
 
 class Tag(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     name=db.Column(db.String(100))
-    slug=db.Column(db.String(100))
-    postId=db.Column(db.Integer, db.ForeignKey('articl.id'))
+    postId=db.Column(db.Integer,  db.ForeignKey('article.id'))
+
+
     def __repr__(self) :
-        return f'<Tag{self.slug}>'
-    # def __init__ (self,*args,**kwargs):
-    #     super(Tag,self).__init__(*args,**kwargs)
-    #     self.slug=slugify(self.name)
+        return f'<Tag{self.postId}>'
+
 
 class Users(db.Model, UserMixin):
     __tablename__ = 'Users'
@@ -80,11 +78,12 @@ def server_error(error):
 
 admin.add_view(ModelView(Users,db.session))
 admin.add_view(ModelView(Article,db.session))
+admin.add_view(ModelView(Tag,db.session))
 
 class ArticleForm(FlaskForm):
     Header=StringField('заголовок', validators=[DataRequired()])
     img1=  FileField()
-    img_name1=StringField('img name 1')
+    # img_name1=StringField('img name 1')
     Content =StringField(u'статья', widget=TextArea(),validators=[DataRequired()])
     Btm = SubmitField('Добавить')
     def validate_Content(self, field) :
@@ -117,19 +116,15 @@ class RegisterForm(FlaskForm) :
 
 @app.route('/')
 def index():
-    order = request.args.get('sort')
+    sort = request.args.get('sort')
     page=request.args.get('page')
-    tag=request.args.get('tag')
+    
     articles = Article.query.order_by(Article.creationData.desc())
 
-    if tag:
-        tags= Tag.query.filter_by(name=tag).first()
-        articles=Article.query.filter_by(id=tags.postId)
-        
-    if order is not None:
-        if order == '1':
+    if sort is not None:
+        if sort == '1':
             articles = Article.query.order_by(Article.creationData)
-        elif order == '2':
+        elif sort == '2':
             articles = Article.query.order_by(Article.creationData.desc())
 
     if page and page.isdigit():
@@ -140,11 +135,20 @@ def index():
     pages=articles.paginate(page=page,per_page=10)
     return render_template('index.html',articles=articles,pages =pages)
 
+@app.route('/post_tag/<tag>', methods=['GET','POST'])
+def tag(tag):
+    if tag:
+        articles= Tag.query.filter(Tag.name==tag).all()
+        return  render_template('post_tag.html',tags=articles)
+    return  render_template('post_tag.html')
+
+
 @app.route('/show', methods=['GET'])
 def show():
 
     artId = request.args.get('id')
     tags=Tag.query.filter_by(postId=artId).all()
+
     text = Article.query.filter_by(id=artId).first()
     return render_template('show.html',art=text,tags=tags)
 
@@ -170,8 +174,7 @@ def register() :
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
+
     form=LoginForm()
     if form.validate_on_submit():
         user = form.username.data
@@ -194,24 +197,26 @@ def login():
 @app.route('/add', methods=['GET', 'POST'])
 @login_required
 def add():
-    # time = datetime.now()
     form = ArticleForm()
     Header=request.form.get('Header')
     Authors=current_user.username
     Content= request.form.get('Content')
-    f1=form.img1.data
-    fname1=request.form.get('img_name1')
-
-    if f1:
-        name=fname1+'.jpg'
-        image = Image.open(f1)
+    img=form.img1.data
+    tags=['flask','python','web']
+    tag=random.choice(tags)
+    if img:
+        name=img.filename
+        image = Image.open(img)
         size=480,480
         image = image.resize(size)
         image.save(os.path.join(app.config['UPLOAD_FOLDER'], name))
 
     if form.validate_on_submit():
-        article = Article(Authors=Authors, Header=Header, content=Content, img1=name)#creationData=time)
+        article = Article(Authors=Authors, Header=Header, content=Content, img1=name)
         db.session.add(article)
+        db.session.commit()
+        tag=Tag(name=tag,postId=article.id)
+        db.session.add(tag)
         db.session.commit()
         return redirect('/')
     return render_template('add.html', form=form)

@@ -1,0 +1,28 @@
+
+
+        {% extends "base.html" %}
+
+        {% block content %}
+        
+ 
+
+<div class="container mt-5">
+
+    {%for tag in tags%}
+    <div class="alert alert-secondary">
+        <h2>{{tag.tags.Header}}</h2>
+        <p>{{ tag.tags.Authors}}</p>
+        <p><b>Дата : {{tag.tags.creationData}}</b></p>
+        <a href="/show?id={{ tag.tags.id }}"class="btn btn-warning"> Детальнее </a>
+    </div>
+
+    {%endfor%}
+
+            </ul>
+
+
+{% endblock %}
+
+</body>
+
+</html>
